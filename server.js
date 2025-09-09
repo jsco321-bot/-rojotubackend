@@ -47,6 +47,8 @@ app.use(
     helmet(),
 );
 
+app.get("/health", (_, res) => res.sendStatus(204));
+
 app.use(cors(corsOptionsDelegate));
 
 app.disable('x-powered-by');
@@ -115,7 +117,6 @@ if (process.env.SWAGGER_ON === true) {
 }
 
 
-app.get("/health", (_, res) => res.sendStatus(204));
 
 const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => console.log(`Listening on ${port}`));
@@ -123,6 +124,7 @@ app.listen(port, "0.0.0.0", () => console.log(`Listening on ${port}`));
 
 
 module.exports = app;
+
 
 
 
