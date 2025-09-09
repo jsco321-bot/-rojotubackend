@@ -114,14 +114,16 @@ if (process.env.SWAGGER_ON === true) {
     })
 }
 
-const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-});
+app.get("/health", (_, res) => res.sendStatus(204));
+
+const port = process.env.PORT || 8080;
+app.listen(port, "0.0.0.0", () => console.log(`Listening on ${port}`));
+
 
 
 module.exports = app;
+
 
 
 
