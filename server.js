@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const { useSwaggerDocs } = require('./swagger.js');
 const allowedMethods = ['GET', 'POST']
 const sqlInjectionPattern = /(\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|--|;|'|"|\/\*|\*\/|xp_)\b)/i;
-const allowlist = [process.env.CORS_ROJOTU, process.env.CORS_UAT, process.env.CORS_LOCAL, process.env.LOCAL_FRONT]
+const allowlist = [process.env.CORS_ROJOTU, process.env.CORS_UAT, process.env.CORS_LOCAL, process.env.LOCAL_FRONT,process.env.CORS_ROJOTU_W]
 
 db.sequelize.sync()
   .then(() => console.log("DB OK"))
@@ -123,6 +123,7 @@ app.listen(port, "0.0.0.0", () => console.log(`Listening on ${port}`));
 
 
 module.exports = app;
+
 
 
 
