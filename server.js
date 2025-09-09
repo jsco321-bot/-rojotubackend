@@ -17,7 +17,8 @@ db.sequelize.sync()
     // 👇 NO tumbar el proceso
   });
 
-app.get("/health", (_, res) => res.sendStatus(204));
+app.use((req,res,next)=>{ if(req.path==='/health') return res.sendStatus(204); next(); });
+app.get('/', (_, res) => res.send('OK'));
 
 var corsOptionsDelegate = function (req, callback) {
   let corsOptions;
@@ -132,6 +133,7 @@ app.listen(port, "0.0.0.0", () => console.log(`Listening on ${port}`));
 
 
 module.exports = app;
+
 
 
 
