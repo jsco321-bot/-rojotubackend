@@ -17,15 +17,22 @@ db.sequelize.sync()
     // 👇 NO tumbar el proceso
   });
 
+app.get("/health", (_, res) => res.sendStatus(204));
+
 var corsOptionsDelegate = function (req, callback) {
-    var corsOptions;
-    if (allowlist.indexOf(req.header('Origin')) !== -1) {
-        corsOptions = { origin: true }
-    } else {
-        corsOptions = { origin: false }
-    }
-    callback(null, corsOptions)
-}
+  let corsOptions;
+  const origin = req.header('Origin');
+
+  if (!origin) {
+    // ✅ Probes internos y llamadas servidor-servidor no envían Origin
+    corsOptions = { origin: true };
+  } else if (allowlist.indexOf(origin) !== -1) {
+    corsOptions = { origin: true };
+  } else {
+    corsOptions = { origin: false };
+  }
+  callback(null, corsOptions);
+};
 
 function securityHeadersMiddleware(req, res, next) {
     res.removeHeader('Referrer-Policy');
@@ -41,13 +48,14 @@ function securityHeadersMiddleware(req, res, next) {
     next();
 }
 
+
 app.use(securityHeadersMiddleware);
 
 app.use(
     helmet(),
 );
 
-app.get("/health", (_, res) => res.sendStatus(204));
+
 
 app.use(cors(corsOptionsDelegate));
 
@@ -124,6 +132,7 @@ app.listen(port, "0.0.0.0", () => console.log(`Listening on ${port}`));
 
 
 module.exports = app;
+
 
 
 
