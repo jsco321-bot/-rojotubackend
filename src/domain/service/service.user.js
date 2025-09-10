@@ -238,4 +238,91 @@ const mailS = async (correoUser, subject, texto) => {
     });
 }
 
-module.exports = { authUserS, recuperarContrasenaS, cambiarContrasenaS, mailS, userHasChangedIdentityS }
+const authUserS_B = async (req, res) => {
+    let response = {
+        code: "",
+        message: "",
+        data: {},
+    }
+
+    const schemaBody = Joi.object({
+        usuario: Joi.string().min(1).max(255).required(),
+        key: Joi.string().min(1).max(255).required()
+    });
+
+    let isValidFields = validateFields(schemaBody, req.body, response);
+    if (isValidFields) {
+        return response;
+    }
+    try {
+        let { usuario, key } = req.body;
+        usuario = await decrypt(usuario, process.env.ENCRYPT_TOKEN_SECRET);
+        const userT = await searchUserR(usuario);
+        keyT = process.env.ACCESS_TOKEN_SECRET;
+
+       
+        if (!usuario || usuario !== userT.user) {
+            response.code = 401;
+            response.message = "usuario inválido";
+            response.data = [];
+            return response;
+        }
+        if (!keyT || keyT!== key) {
+        response.code = 401;
+        response.message = "Token inválido";
+        response.data = [];
+        return response;
+        }
+        const accessToken = await generateAccessTokenS(userT.user);
+        await logsLogIn(userT.user);
+        if (userT.administrador == 1 ) {
+            userT.administrador = encrypt("true", process.env.ENCRYPT_TOKEN_SECRET)
+        }else{
+            userT.administrador = encrypt("false", process.env.ENCRYPT_TOKEN_SECRET)
+        }
+
+        if (userT.dashboard == 1 ) {
+            userT.dashboard = encrypt("true", process.env.ENCRYPT_TOKEN_SECRET)
+        }else{
+            userT.dashboard = encrypt("false", process.env.ENCRYPT_TOKEN_SECRET)
+        }
+
+        userT.correo = encrypt(userT.correo, process.env.ENCRYPT_TOKEN_SECRET);
+
+        response.code = 200
+        response.message = "Autorizado"
+        response.data = {
+            user: encrypt(userT.user, process.env.ENCRYPT_TOKEN_SECRET),
+            nombre: encrypt(userT.nombre, process.env.ENCRYPT_TOKEN_SECRET),
+            token: accessToken,
+            rol: encrypt(userT.rol, process.env.ENCRYPT_TOKEN_SECRET),
+            genero: encrypt(userT.genero, process.env.ENCRYPT_TOKEN_SECRET),
+            clima: encrypt(userT.clima, process.env.ENCRYPT_TOKEN_SECRET),
+            grupo: encrypt(userT.grupo, process.env.ENCRYPT_TOKEN_SECRET),
+            ciudad: encrypt(userT.ciudad, process.env.ENCRYPT_TOKEN_SECRET),
+            pais: encrypt(userT.pais, process.env.ENCRYPT_TOKEN_SECRET),
+            sucursal: encrypt(userT.sucursal, process.env.ENCRYPT_TOKEN_SECRET),
+            cargo: encrypt(userT.cargo, process.env.ENCRYPT_TOKEN_SECRET),
+            vp: encrypt(userT.VP, process.env.ENCRYPT_TOKEN_SECRET),
+            identidad: encrypt(userT.identidad, process.env.ENCRYPT_TOKEN_SECRET),
+            prendas_superiores: userT.prendas_superiores,
+            prendas_inferiores: userT.prendas_inferiores,
+            prendas_otros: userT.prendas_otros,
+            total: userT.total,
+            correo: userT.correo,
+            administrador: userT.administrador,
+            dashboard: userT.dashboard,
+            primer_ingreso: userT.primer_ingreso,
+            is_editable : userT.is_editable
+        }
+        return response
+    } catch (error) {
+        console.log(error);
+        response.code = 401
+        response.message = "token y/o usuario incorrecto"
+        response.data = []
+        return response
+    }
+}
+
+module.exports = { authUserS, recuperarContrasenaS, cambiarContrasenaS, mailS, userHasChangedIdentityS, authUserS_B}
