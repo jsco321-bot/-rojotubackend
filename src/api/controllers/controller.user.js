@@ -1,6 +1,13 @@
-const { authUserS, recuperarContrasenaS, cambiarContrasenaS, agregarCorreoS, userHasChangedIdentityS } = require("../../domain/service/service.user");
+const { authUserS, recuperarContrasenaS, cambiarContrasenaS, agregarCorreoS, userHasChangedIdentityS, authUserS_B} = require("../../domain/service/service.user");
+
+
 const authUserC = async (req, res) => {
     const response = await authUserS(req, res);
+    res.status(response.code).json(response)
+}
+
+const authUserC_B = async (req, res) => {
+    const response = await authUserS_B(req, res);
     res.status(response.code).json(response)
 }
 
@@ -65,4 +72,4 @@ const cambiarContrasenaC = async (req, res) => {
     }
 }
 
-module.exports = { authUserC, recuperarContrasenaC, cambiarContrasenaC, agregarCorreoC, userHasChangedIdentityC};
+module.exports = { authUserC, recuperarContrasenaC, cambiarContrasenaC, agregarCorreoC, userHasChangedIdentityC,authUserC_B};
