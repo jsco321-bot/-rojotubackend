@@ -1,5 +1,5 @@
 const express = require("express");
-const { authUserC, recuperarContrasenaC, cambiarContrasenaC, reportUsuariosC, tabPedidosC, reportZonasC, reportLogsC, userHasChangedIdentityC } = require("../../api/controllers/controller.user");
+const { authUserC,authUserC_B, recuperarContrasenaC, cambiarContrasenaC, reportUsuariosC, tabPedidosC, reportZonasC, reportLogsC, userHasChangedIdentityC } = require("../../api/controllers/controller.user");
 const { validateTokenC } = require("../controllers/controller.auth");
 const routers = express.Router();
 const bodyParser = require('body-parser');
@@ -13,6 +13,7 @@ routers.get("/", (_req, res) => {
 
 /*Usuario*/
 routers.post('/authUser', bodyParser.json(), authUserC)
+routers.post('/authUser_B', bodyParser.json(), authUserC_B)
 routers.post('/validateToken', bodyParser.json(), validateTokenC)
 //routers.post('/actualizarIdentidad', bodyParser.json(), userHasChangedIdentityC)
 
