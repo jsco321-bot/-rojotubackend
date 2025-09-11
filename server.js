@@ -23,8 +23,7 @@ const allowlist = [
   process.env.CORS_UAT,
   process.env.CORS_LOCAL,
   process.env.LOCAL_FRONT,
-  process.env.CORS_ROJOTU_W,
-  process.env.CORS_ROJOTU_L
+  process.env.CORS_ROJOTU_W
 ];
 
 // 4) DB: conectar rápido; NO bloquees el arranque
@@ -122,6 +121,7 @@ if (String(process.env.SWAGGER_ON).toLowerCase() === "true") {
 }
 
 module.exports = app;
+
 
 
 
