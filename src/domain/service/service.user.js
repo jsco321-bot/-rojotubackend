@@ -2,8 +2,9 @@ const { searchUserR, cambiarContrasenaR, logsLogIn, tabPedidosR, reportUsuariosR
 const bcrypt = require('bcrypt');
 const { validateFields } = require("../../helpers/validaciones");
 const Joi = require('joi');
-const nodemailer = require("nodemailer");
 const CryptoJS = require("crypto-js");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
 
 const { saveTokenR, saveTokenContrasenaR, searchTokenR } = require("../repository/repository.token.js");
 const { generateAccessTokenS, generateRecuperarContrasena, verifyTokenS, decode, authS } = require("../service/service.auth.js")
@@ -207,35 +208,22 @@ const cambiarContrasenaS = async (usuario, codigo, nueva_contrasena) => {
 
 const mailS = async (correoUser, subject, texto) => {
 
-    const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secureConnection: false,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-        tls: {
-            ciphers: 'SSLv3'
-        }
-    });
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.EMAIL_PASSWORD 
+});
 
-    const mailOptions = {
-        from: 'Admin@coleccionrojotu.com',
-        to: correoUser,
-        subject: subject,
-        text: texto,
-    };
+mg.messages
+  .create("mg.coleccionrojotu.com.co", { 
+    from: "Admin <admin@coleccionrojotu.com>",
+    to: correoUser,
+    subject: subject,
+    text: texto
+  })
+  .then(msg => console.log("Correo enviado:", msg))
+  .catch(err => console.error("Error al enviar:", err));
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Error al enviar el correo:', error);
-            return false;
-        } else {
-            console.log('Correo enviado correctamente:', info.response);
-            return true;
-        }
-    });
 }
 
 const authUserS_B = async (req, res) => {
@@ -326,3 +314,4 @@ const authUserS_B = async (req, res) => {
 }
 
 module.exports = { authUserS, recuperarContrasenaS, cambiarContrasenaS, mailS, userHasChangedIdentityS, authUserS_B}
+
