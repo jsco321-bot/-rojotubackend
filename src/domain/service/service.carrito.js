@@ -2,8 +2,10 @@ const { buscarCarritoR, quitarPrendaR, agregarPrendaR, enviarCarritoR } = requir
 const { searchUserR } = require('../repository/repository.user.js');
 const { authS, decode } = require('./service.auth.js');
 const ejs = require("ejs");
-const nodemailer = require("nodemailer");
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
 const path = require('path');
+
 
 const buscarCarritoS = async (req, res) => {
     let response = {
