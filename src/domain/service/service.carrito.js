@@ -105,19 +105,7 @@ const quitarPrendaS = async (req, id_prenda) => {
 
 const enviarMailCarritoS = async (correoUser, subject, texto, nombre_usuario, usuario) => {
     
-    const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secureConnection: false,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-        tls: {
-            ciphers: 'SSLv3'
-        }
-    });
-
+    
     let lista_prendas = await prepMailCarrioS(usuario);
 
     var jsonPath = path.join(__dirname, '..', 'assets', 'index.html');
@@ -137,40 +125,34 @@ const enviarMailCarritoS = async (correoUser, subject, texto, nombre_usuario, us
 
     newHmtl = newHmtl.replace("<prendas>", lista_prendas)
 
-    const mailOptions = {
-        from: 'Admin@coleccionrojotu.com',
-        to: correoUser,
-        subject: subject,
-        text: texto,
-        attachments:
-            [
-                {
-                    filename: 'header.jpg',
-                    path: header,
-                    cid: 'header'
-                },
-                {
-                    filename: 'footer.jpg',
-                    path: footer,
-                    cid: 'footer'
-                }
-            ],
-        html: newHmtl
-    };
-
-    let errorM = false;
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Error al enviar el correo:', error);
-            errorM = true
-        }else{
-            console.log('Correo enviado correctamente:', info.response);
-        }
-    });
-
-    if (errorM) {
-        return false;
-    }
+    const mailgun = new Mailgun(formData);
+           const mg = mailgun.client({
+           username: "api",
+           key: process.env.EMAIL_PASSWORD 
+           });
+   
+           mg.messages
+           .create("mg.coleccionrojotu.com.co", { 
+           from: "Admin <admin@coleccionrojotu.com>",
+           to: correoUser,
+           subject: subject,
+           html: newHmtl,
+           attachments:
+               [
+                   {
+                       filename: 'header.jpg',
+                       path: header,
+                       cid: 'header'
+                   },
+                   {
+                       filename: 'footer.jpg',
+                       path: footer,
+                       cid: 'footer'
+                   }
+               ]
+           })
+           .then(msg => console.log("Correo enviado:", msg))
+           .catch(err => console.error("Error al enviar:", err));
 
     return true
 }
